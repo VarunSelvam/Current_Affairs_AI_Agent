@@ -12,10 +12,10 @@ def current_events_summary(data: str, file: str = "news_summary.txt"):
 
 
 # Wrap this function into a tool that the LLM's can access.
-new_summary_report_tool = Tool(
+news_summary_report_tool = Tool(
     name = "save_to_text_file",
     func = current_events_summary, 
-    description="Save the news summary to a text file" 
+    description="write the final news summary report with the report title and ALL of the news reports's content into a text file." 
 )
 
 

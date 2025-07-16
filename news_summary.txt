@@ -44,15 +44,5 @@ Timestamp: 2025-07-11 02:17:29
 
 {"news_topic": "South Korea Geopolitical and Technological Landscape", "edited_report": "As of July 2025, South Korea continues to be a significant technological and economic powerhouse in East Asia. The country maintains its focus on technological innovation, particularly in semiconductors, artificial intelligence, and green technology. Geopolitical tensions with North Korea remain a constant background concern, with ongoing diplomatic and security challenges. South Korea's strategic relationship with the United States and its technological partnerships in the global market remain crucial to its national interests.", "tools_utilized": "news_search"}
 
-
-
---- News Summary ---
-Timestamp: 2025-07-11 02:31:53
-
-{'Comic Books': "While the search results didn't provide comprehensive current news for July 2025, the comic book industry continues to evolve with ongoing publications, digital platforms, and diverse content. Comic databases like Comic Vine remain important resources for tracking new releases, reviews, and industry trends. The market continues to show interest in various genres, from superhero narratives to independent publications across different formats."}
-
---- News Summary ---
-Timestamp: 2025-07-11 02:31:54
-
 {"Comic Books": "While the search results didn't provide comprehensive current news for July 2025, the comic book industry continues to evolve with ongoing publications, digital platforms, and diverse content. Comic databases like Comic Vine remain important resources for tracking new releases, reviews, and industry trends. The market continues to show interest in various genres, from superhero narratives to independent publications across different formats."}
 

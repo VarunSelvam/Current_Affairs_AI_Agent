@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------------------
 # Import statements
+import datetime as dt
+import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from langchain_openai import ChatOpenAI
@@ -7,8 +9,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain.agents import create_tool_calling_agent, AgentExecutor
-import datetime as dt
-from agent_tools import news_search_tool, news_summary_report_tool
+from agent_tools import news_search_tool, news_summary_report_tool,news_headline_tool
 #-------------------------------------------------------------------------------------------
 
 # Extract Current Time and 7 days beforehand for a week
@@ -21,10 +22,12 @@ current_date = current_date[0:10]
 
 seven_days_ago = str(seven_days_ago)
 seven_days_ago = seven_days_ago[0:10]
-# First Agent, Anthropic to summarize the news
 
 # Loading API Keys
-load_dotenv()
+os.chdir("..")
+upper_path = os.getcwd()
+env_path = os.path.join(upper_path,"Environment_Variables",".env")
+load_dotenv(dotenv_path=env_path)
 
 # Specifying format of the news report
 class NewsReport(BaseModel):
@@ -33,7 +36,8 @@ class NewsReport(BaseModel):
     tools_utilized: (str)
 
 # Call AI Model and intialize it.
-anthropic = ChatAnthropic(model="claude-3-5-haiku-20241022")
+# First Agent, Anthropic to summarize the news
+claude = ChatAnthropic(model="claude-3-5-haiku-20241022")
 
 # Check that model works
 # response = Anthropic.invoke("What is the meaning of life?")
@@ -61,10 +65,10 @@ task_description = ChatPromptTemplate.from_messages(
 ).partial(report_format=python_parser.get_format_instructions(),week_beginning = seven_days_ago, week_end = current_date)
 
 # Give access to the new_search, so that this AI Agent can search the web.
-tool_kit = [news_search_tool]
+tool_kit = [news_search_tool,news_headline_tool]
 # Intialize Agent
 news_agent = create_tool_calling_agent( # Creates the agent
-    llm=anthropic,
+    llm=claude,
     prompt=task_description,
     tools=tool_kit
 )
@@ -75,7 +79,7 @@ news_executor = AgentExecutor(agent=news_agent,tools=tool_kit,verbose=True) # Ag
 # Prompt the user for a query
 user_question = input("Hello, I can help answer current event questions. Please ask: ")
 
-# Store query in an unfiltered JSON format
+# Store query in an unfiltered JSON format (Actually run the agent)
 unfiltered_response = news_executor.invoke({"query": user_question})
 
 # Use try-except to catch errors and clean the response
@@ -95,13 +99,10 @@ except Exception as e:
 #-------------------------------------------------------------------------------------------
 # ChatGPT to edit the summary and approve it afterwards
 
-chat_gpt = ChatOpenAI(model="gpt-3.5-turbo")
-
+chat_gpt = ChatOpenAI(model="gpt-4.1-2025-04-14")
 # Check that model works
 # response = chat_gpt.invoke("What is the meaning of life?")
 # print(response)
-
-load_dotenv()
 
 class NewsReportEdit(BaseModel):
     news_topic: str
@@ -118,9 +119,10 @@ news_editor_task = ChatPromptTemplate.from_messages(
             "system",
             """
             You are a news editor who must decide whether to approve or edit the news summary provided by a news agent.
-            You may also use any internet search tools to do additional research, should you think that additional info is required.
+            You may also use any internet search tools to do additional research for editing, if you think that additional info is required.
             However any additional research must be relevant from this date: {week_beg} to this date: {week_finish}
-            REQUIRED - Once you are done making edits or approving the summary, you must MANDATORILY save the news summary w/all its contents to this computer.
+            REQUIRED - Once you are done making edits or approving the summary, you must MANDATORILY save the news summary w/all of its contents to this computer. If you decided to edit the news summary, then save ONLY the edited new summary to this computer.
+            REQUIRED - Use this tool "news_summary_report_tool" to write the summary to the computer.
             Wrap the output in this format and provide no other text\n{edited_report_format} 
             """,
         ),
